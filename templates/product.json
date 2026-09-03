@@ -1,1 +1,118 @@
-{"sections":{"main":{"type":"main-product","blocks":{"vendor":{"type":"text","settings":{"text":"{{ product.vendor }}","text_style":"uppercase"}},"title":{"type":"title","settings":{}},"price":{"type":"price","settings":{}},"variant_picker":{"type":"variant_picker","settings":{"picker_type":"button","swatch_shape":"circle"}},"quantity_selector":{"type":"quantity_selector","settings":{}},"buy_buttons":{"type":"buy_buttons","settings":{"show_dynamic_checkout":true,"show_gift_card_recipient":true}},"description":{"type":"description","settings":{}},"share":{"type":"share","settings":{"share_label":"Share"}}},"block_order":["vendor","title","price","variant_picker","quantity_selector","buy_buttons","description","share"],"settings":{"enable_sticky_info":true,"color_scheme":"scheme-1","media_size":"large","constrain_to_viewport":true,"media_fit":"contain","gallery_layout":"stacked","mobile_thumbnails":"hide","media_position":"left","image_zoom":"lightbox","hide_variants":true,"enable_video_looping":false,"padding_top":36,"padding_bottom":12}},"disclosures":{"type":"disclosures","settings":{"padding_top":36,"padding_bottom":0}},"related-products":{"type":"related-products","settings":{"heading":"You may also like","heading_size":"h2","products_to_show":4,"columns_desktop":4,"columns_mobile":"2","color_scheme":"scheme-1","image_ratio":"square","image_shape":"default","show_secondary_image":true,"show_vendor":false,"show_rating":false,"padding_top":36,"padding_bottom":28}}},"order":["main","disclosures","related-products"]}
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": { "type": "title", "settings": {} },
+        "rating": { "type": "rating", "settings": {} },
+        "price": { "type": "price", "settings": {} },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "text_style": "uppercase",
+            "inventory_threshold": 10,
+            "show_inventory_quantity": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": { "picker_type": "button", "swatch_shape": "circle" }
+        },
+        "quantity_selector": { "type": "quantity_selector", "settings": {} },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": { "show_dynamic_checkout": true, "show_gift_card_recipient": true }
+        },
+        "whatsapp_order": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "<a href=\"https://wa.me/92XXXXXXXXXX?text={{ 'Hi, I am interested in ' | append: product.title | url_encode }}\" target=\"_blank\" rel=\"noopener\" class=\"button button--secondary\" style=\"display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-top:1rem;border-color:#25D366;color:#25D366;\"><span aria-hidden=\"true\">💬</span> Order via WhatsApp</a>\n<!-- Replace 92XXXXXXXXXX above with your real WhatsApp number (country code, no + or spaces) -->"
+          }
+        },
+        "trust_badges": {
+          "type": "icon-with-text",
+          "settings": {
+            "layout": "horizontal",
+            "icon_1": "return",
+            "heading_1": "Cash on Delivery",
+            "icon_2": "lock",
+            "heading_2": "Secure Payment",
+            "icon_3": "truck",
+            "heading_3": "Fast Delivery"
+          }
+        },
+        "description": { "type": "description", "settings": {} },
+        "shipping_tab": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping & Delivery",
+            "icon": "truck",
+            "content": "<p>Orders are hygienically packed and shipped nationwide. Cash on delivery is available alongside secure online payment options.</p>"
+          }
+        },
+        "storage_tab": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Storage & Freshness",
+            "icon": "box",
+            "content": "<p>Store in a cool, dry place away from direct sunlight. Reseal the packaging tightly after opening to keep the product fresh for longer.</p>"
+          }
+        },
+        "share": { "type": "share", "settings": { "share_label": "Share" } }
+      },
+      "block_order": [
+        "title",
+        "rating",
+        "price",
+        "inventory",
+        "variant_picker",
+        "quantity_selector",
+        "buy_buttons",
+        "whatsapp_order",
+        "trust_badges",
+        "description",
+        "shipping_tab",
+        "storage_tab",
+        "share"
+      ],
+      "settings": {
+        "enable_sticky_info": true,
+        "color_scheme": "scheme-1",
+        "media_size": "large",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "gallery_layout": "thumbnail_slider",
+        "mobile_thumbnails": "show",
+        "media_position": "left",
+        "image_zoom": "lightbox",
+        "hide_variants": true,
+        "enable_video_looping": false,
+        "padding_top": 36,
+        "padding_bottom": 12
+      }
+    },
+    "disclosures": {
+      "type": "disclosures",
+      "settings": { "padding_top": 36, "padding_bottom": 0 }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "heading": "You May Also Like",
+        "heading_size": "h1",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-1",
+        "image_ratio": "square",
+        "image_shape": "arch",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": true,
+        "padding_top": 36,
+        "padding_bottom": 28
+      }
+    }
+  },
+  "order": ["main", "disclosures", "related-products"]
+}
