@@ -1,1 +1,145 @@
-{"name":"t:sections.header.name","type":"header","sections":{"announcement-marquee":{"type":"announcement-marquee","settings":{"color_scheme":"scheme-9","speed":25},"blocks":{"msg-1":{"type":"message","settings":{"icon":"🚚","text":"Free Shipping Over Rs. 3,000"}},"msg-2":{"type":"message","settings":{"icon":"🔒","text":"100% Secure Checkout"}},"msg-3":{"type":"message","settings":{"icon":"📦","text":"Fast Nationwide Delivery"}},"msg-4":{"type":"message","settings":{"icon":"⭐","text":"Trusted by Thousands of Customers"}}},"block_order":["msg-1","msg-2","msg-3","msg-4"]},"header":{"type":"header","settings":{"logo_position":"middle-left","mobile_logo_position":"center","menu":"main-menu","menu_type_desktop":"dropdown","sticky_header_type":"on-scroll-up","show_line_separator":true,"color_scheme":"scheme-1","menu_color_scheme":"scheme-1","enable_country_selector":true,"enable_language_selector":true,"margin_bottom":0,"padding_top":20,"padding_bottom":20}},"category-nav-strip":{"type":"category-nav-strip","settings":{"color_scheme":"scheme-6"},"blocks":{"cat-1":{"type":"nav_item","settings":{"icon":"🌰","label":"Almonds","link":"shopify://collections/all"}},"cat-2":{"type":"nav_item","settings":{"icon":"🫘","label":"Cashews","link":"shopify://collections/all"}},"cat-3":{"type":"nav_item","settings":{"icon":"🍑","label":"Apricots","link":"shopify://collections/all"}},"cat-4":{"type":"nav_item","settings":{"icon":"🍒","label":"Cherries","link":"shopify://collections/all"}},"cat-5":{"type":"nav_item","settings":{"icon":"🎃","label":"Seeds","link":"shopify://collections/all"}},"cat-6":{"type":"nav_item","settings":{"icon":"🍯","label":"Honey","link":"shopify://collections/all"}}},"block_order":["cat-1","cat-2","cat-3","cat-4","cat-5","cat-6"]}},"order":["announcement-marquee","header","category-nav-strip"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-marquee": {
+      "type": "announcement-marquee",
+      "settings": {
+        "color_scheme": "scheme-9",
+        "speed": 25
+      },
+      "blocks": {
+        "msg-1": {
+          "type": "message",
+          "settings": {
+            "icon": "🚚",
+            "text": "Free Shipping Over Rs. 3,000"
+          }
+        },
+        "msg-2": {
+          "type": "message",
+          "settings": {
+            "icon": "🔒",
+            "text": "100% Secure Checkout"
+          }
+        },
+        "msg-3": {
+          "type": "message",
+          "settings": {
+            "icon": "📦",
+            "text": "Fast Nationwide Delivery"
+          }
+        },
+        "msg-4": {
+          "type": "message",
+          "settings": {
+            "icon": "⭐",
+            "text": "Trusted by Thousands of Customers"
+          }
+        }
+      },
+      "block_order": [
+        "msg-1",
+        "msg-2",
+        "msg-3",
+        "msg-4"
+      ]
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-left",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "sticky_header_type": "on-scroll-up",
+        "show_line_separator": true,
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    },
+    "category-nav-strip": {
+      "type": "category-nav-strip",
+      "settings": {
+        "color_scheme": "scheme-6"
+      },
+      "blocks": {
+        "cat-1": {
+          "type": "nav_item",
+          "settings": {
+            "icon": "🌰",
+            "label": "Almonds",
+            "link": "shopify://collections/all"
+          }
+        },
+        "cat-2": {
+          "type": "nav_item",
+          "settings": {
+            "icon": "🫘",
+            "label": "Cashews",
+            "link": "shopify://collections/all"
+          }
+        },
+        "cat-3": {
+          "type": "nav_item",
+          "settings": {
+            "icon": "🍑",
+            "label": "Apricots",
+            "link": "shopify://collections/all"
+          }
+        },
+        "cat-4": {
+          "type": "nav_item",
+          "settings": {
+            "icon": "🍒",
+            "label": "Cherries",
+            "link": "shopify://collections/all"
+          }
+        },
+        "cat-5": {
+          "type": "nav_item",
+          "settings": {
+            "icon": "🎃",
+            "label": "Seeds",
+            "link": "shopify://collections/all"
+          }
+        },
+        "cat-6": {
+          "type": "nav_item",
+          "settings": {
+            "icon": "🍯",
+            "label": "Honey",
+            "link": "shopify://collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "cat-1",
+        "cat-2",
+        "cat-3",
+        "cat-4",
+        "cat-5",
+        "cat-6"
+      ]
+    }
+  },
+  "order": [
+    "announcement-marquee",
+    "header",
+    "category-nav-strip"
+  ]
+}

@@ -36,6 +36,7 @@
         "button"
       ],
       "settings": {
+        "image": "shopify://shop_images/Dry_fruit_website_banner_design_202609040423.jpg",
         "image_overlay_opacity": 20,
         "image_height": "large",
         "image_behavior": "none",
