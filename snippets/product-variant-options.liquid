@@ -96,8 +96,28 @@
       {{ input_dataset }}
     >
     <label for="{{ input_id }}">
-      {{ value -}}
-      {{ label_unavailable }}
+      <span class="variant-option-name">
+        {{- value -}}
+        {{ label_unavailable }}
+      </span>
+      {%- if value.variant -%}
+        <span class="variant-option-price">
+          {%- if value.variant.compare_at_price > value.variant.price -%}
+            <s>
+              {%- if settings.currency_code_enabled -%}
+                {{- value.variant.compare_at_price | money_with_currency -}}
+              {%- else -%}
+                {{- value.variant.compare_at_price | money -}}
+              {%- endif -%}
+            </s>
+          {%- endif -%}
+          {%- if settings.currency_code_enabled -%}
+            {{- value.variant.price | money_with_currency -}}
+          {%- else -%}
+            {{- value.variant.price | money -}}
+          {%- endif -%}
+        </span>
+      {%- endif -%}
     </label>
   {%- elsif picker_type == 'dropdown' or picker_type == 'swatch_dropdown' -%}
     <option
