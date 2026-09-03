@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero_banner": {
@@ -22,7 +31,10 @@
           }
         }
       },
-      "block_order": ["heading", "button"],
+      "block_order": [
+        "heading",
+        "button"
+      ],
       "settings": {
         "image_overlay_opacity": 20,
         "image_height": "large",
@@ -39,12 +51,37 @@
     "collection_ticker": {
       "type": "product-collection-ticker",
       "blocks": {
-        "col-1": { "type": "collection_item", "settings": {} },
-        "col-2": { "type": "collection_item", "settings": {} },
-        "col-3": { "type": "collection_item", "settings": {} },
-        "col-4": { "type": "collection_item", "settings": {} }
+        "col-1": {
+          "type": "collection_item",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "col-2": {
+          "type": "collection_item",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "col-3": {
+          "type": "collection_item",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "col-4": {
+          "type": "collection_item",
+          "settings": {
+            "collection": ""
+          }
+        }
       },
-      "block_order": ["col-1", "col-2", "col-3", "col-4"],
+      "block_order": [
+        "col-1",
+        "col-2",
+        "col-3",
+        "col-4"
+      ],
       "settings": {
         "color_scheme": "scheme-1",
         "speed": 35
@@ -53,7 +90,7 @@
     "best_sellers": {
       "type": "featured-collection",
       "settings": {
-        "collection": "",
+        "collection": "pistachio",
         "products_to_show": 8,
         "title": "Best Selling Dry Fruits in Pakistan",
         "heading_size": "h1",
@@ -81,7 +118,7 @@
     "new_products": {
       "type": "featured-collection",
       "settings": {
-        "collection": "",
+        "collection": "almonds",
         "products_to_show": 8,
         "title": "Freshly Stocked Premium Dry Fruits",
         "heading_size": "h1",
@@ -137,12 +174,45 @@
     "feature_strip": {
       "type": "feature-strip",
       "blocks": {
-        "badge-1": { "type": "badge", "settings": { "icon": "leaf", "heading": "100% Organic", "text": "Certified pure products" } },
-        "badge-2": { "type": "badge", "settings": { "icon": "lock", "heading": "Secure Payments", "text": "Cards, Easypaisa, JazzCash" } },
-        "badge-3": { "type": "badge", "settings": { "icon": "truck", "heading": "Fast Delivery", "text": "Nationwide shipping" } },
-        "badge-4": { "type": "badge", "settings": { "icon": "return", "heading": "Cash on Delivery", "text": "Pay when you receive" } }
+        "badge-1": {
+          "type": "badge",
+          "settings": {
+            "icon": "leaf",
+            "heading": "100% Organic",
+            "text": "Certified pure products"
+          }
+        },
+        "badge-2": {
+          "type": "badge",
+          "settings": {
+            "icon": "lock",
+            "heading": "Secure Payments",
+            "text": "Cards, Easypaisa, JazzCash"
+          }
+        },
+        "badge-3": {
+          "type": "badge",
+          "settings": {
+            "icon": "truck",
+            "heading": "Fast Delivery",
+            "text": "Nationwide shipping"
+          }
+        },
+        "badge-4": {
+          "type": "badge",
+          "settings": {
+            "icon": "return",
+            "heading": "Cash on Delivery",
+            "text": "Pay when you receive"
+          }
+        }
       },
-      "block_order": ["badge-1", "badge-2", "badge-3", "badge-4"],
+      "block_order": [
+        "badge-1",
+        "badge-2",
+        "badge-3",
+        "badge-4"
+      ],
       "settings": {
         "color_scheme": "scheme-6",
         "padding_top": 36,
@@ -166,7 +236,10 @@
           }
         }
       },
-      "block_order": ["heading", "text"],
+      "block_order": [
+        "heading",
+        "text"
+      ],
       "settings": {
         "desktop_content_position": "center",
         "content_alignment": "center",
@@ -179,12 +252,37 @@
     "explore_grid": {
       "type": "collection-list",
       "blocks": {
-        "grid-1": { "type": "featured_collection", "settings": { "collection": "" } },
-        "grid-2": { "type": "featured_collection", "settings": { "collection": "" } },
-        "grid-3": { "type": "featured_collection", "settings": { "collection": "" } },
-        "grid-4": { "type": "featured_collection", "settings": { "collection": "" } }
+        "grid-1": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "grid-2": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "grid-3": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "grid-4": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": ""
+          }
+        }
       },
-      "block_order": ["grid-1", "grid-2", "grid-3", "grid-4"],
+      "block_order": [
+        "grid-1",
+        "grid-2",
+        "grid-3",
+        "grid-4"
+      ],
       "settings": {
         "title": "",
         "heading_size": "h1",
@@ -201,12 +299,41 @@
     "shop_feed": {
       "type": "shop-the-feed",
       "blocks": {
-        "feed-1": { "type": "feed_item", "settings": {} },
-        "feed-2": { "type": "feed_item", "settings": {} },
-        "feed-3": { "type": "feed_item", "settings": {} },
-        "feed-4": { "type": "feed_item", "settings": {} }
+        "feed-1": {
+          "type": "feed_item",
+          "settings": {
+            "product": "",
+            "title": ""
+          }
+        },
+        "feed-2": {
+          "type": "feed_item",
+          "settings": {
+            "product": "",
+            "title": ""
+          }
+        },
+        "feed-3": {
+          "type": "feed_item",
+          "settings": {
+            "product": "",
+            "title": ""
+          }
+        },
+        "feed-4": {
+          "type": "feed_item",
+          "settings": {
+            "product": "",
+            "title": ""
+          }
+        }
       },
-      "block_order": ["feed-1", "feed-2", "feed-3", "feed-4"],
+      "block_order": [
+        "feed-1",
+        "feed-2",
+        "feed-3",
+        "feed-4"
+      ],
       "settings": {
         "title": "See Our Products",
         "heading_size": "h1",
@@ -219,11 +346,39 @@
     "testimonials": {
       "type": "testimonials-carousel",
       "blocks": {
-        "t-1": { "type": "testimonial", "settings": { "name": "Verified Customer", "rating": 5, "quote": "Great quality dry fruits and fast delivery. Highly recommended!", "verified": true } },
-        "t-2": { "type": "testimonial", "settings": { "name": "Verified Customer", "rating": 5, "quote": "Fresh, well packed, and exactly as described. Will order again.", "verified": true } },
-        "t-3": { "type": "testimonial", "settings": { "name": "Verified Customer", "rating": 4, "quote": "Good taste and freshness. Customer service was helpful too.", "verified": true } }
+        "t-1": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Verified Customer",
+            "rating": 5,
+            "quote": "Great quality dry fruits and fast delivery. Highly recommended!",
+            "verified": true
+          }
+        },
+        "t-2": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Verified Customer",
+            "rating": 5,
+            "quote": "Fresh, well packed, and exactly as described. Will order again.",
+            "verified": true
+          }
+        },
+        "t-3": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Verified Customer",
+            "rating": 4,
+            "quote": "Good taste and freshness. Customer service was helpful too.",
+            "verified": true
+          }
+        }
       },
-      "block_order": ["t-1", "t-2", "t-3"],
+      "block_order": [
+        "t-1",
+        "t-2",
+        "t-3"
+      ],
       "settings": {
         "title": "What Our Customers Say",
         "heading_size": "h1",
@@ -254,7 +409,8 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>We bring you premium quality dry fruits, nuts, dried fruits, and specialty products — carefully selected and packed to preserve freshness, whether for daily nutrition or gifting.</p>"
+            "text": "<p>We bring you premium quality dry fruits, nuts, dried fruits, and specialty products — carefully selected and packed to preserve freshness, whether for daily nutrition or gifting.</p>",
+            "text_style": "body"
           }
         },
         "button": {
@@ -266,7 +422,11 @@
           }
         }
       },
-      "block_order": ["heading", "text", "button"],
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
       "settings": {
         "height": "medium",
         "desktop_image_width": "medium",
@@ -290,7 +450,8 @@
           "settings": {
             "heading": "Where do your dry fruits come from?",
             "icon": "question_mark",
-            "row_content": "<p>We source a carefully selected range of premium dry fruits from trusted local and international suppliers, ensuring freshness and quality.</p>"
+            "row_content": "<p>We source a carefully selected range of premium dry fruits from trusted local and international suppliers, ensuring freshness and quality.</p>",
+            "page": ""
           }
         },
         "row-2": {
@@ -298,7 +459,8 @@
           "settings": {
             "heading": "How is my order packed and delivered?",
             "icon": "box",
-            "row_content": "<p>Every order is hygienically packed to preserve freshness and shipped nationwide with fast, trackable delivery.</p>"
+            "row_content": "<p>Every order is hygienically packed to preserve freshness and shipped nationwide with fast, trackable delivery.</p>",
+            "page": ""
           }
         },
         "row-3": {
@@ -306,11 +468,16 @@
           "settings": {
             "heading": "Do you offer cash on delivery?",
             "icon": "truck",
-            "row_content": "<p>Yes, cash on delivery is available nationwide alongside secure online payment options.</p>"
+            "row_content": "<p>Yes, cash on delivery is available nationwide alongside secure online payment options.</p>",
+            "page": ""
           }
         }
       },
-      "block_order": ["row-1", "row-2", "row-3"],
+      "block_order": [
+        "row-1",
+        "row-2",
+        "row-3"
+      ],
       "settings": {
         "caption": "Help & Information",
         "heading": "Frequently Asked Questions About Dry Fruits",
