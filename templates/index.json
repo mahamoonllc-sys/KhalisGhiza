@@ -118,7 +118,7 @@
     "new_products": {
       "type": "featured-collection",
       "settings": {
-        "collection": "",
+        "collection": "almonds",
         "products_to_show": 8,
         "title": "Freshly Stocked Premium Dry Fruits",
         "heading_size": "h1",
