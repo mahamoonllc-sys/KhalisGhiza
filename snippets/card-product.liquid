@@ -27,6 +27,49 @@
   {{ 'component-price.css' | asset_url | stylesheet_tag }}
   {{ 'quick-order-list.css' | asset_url | stylesheet_tag }}
   {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+
+  {%- style -%}
+    .card-vendor {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-vendor__star svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      color: rgb(var(--color-foreground));
+    }
+
+    .card-variant-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1rem 0;
+    }
+
+    .card-variant-pill {
+      padding: 0.6rem 1.2rem;
+      font-size: 1.2rem;
+      font-weight: 500;
+      border-radius: var(--variant-pills-radius);
+      border: 0.1rem solid rgba(var(--color-foreground), 0.35);
+      background: rgb(var(--color-background));
+      color: rgb(var(--color-foreground));
+      cursor: pointer;
+    }
+
+    .card-variant-pill.is-selected {
+      border-color: rgb(var(--color-foreground));
+      background: rgb(var(--color-foreground));
+      color: rgb(var(--color-background));
+    }
+
+    .card-variant-pill:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  {%- endstyle -%}
 {%- endunless -%}
 {%- if card_product and card_product != empty -%}
   {%- liquid
@@ -165,7 +208,10 @@
             <div class="card-information">
               {%- if show_vendor -%}
                 <span class="visually-hidden">{{ 'accessibility.vendor' | t }}</span>
-                <div class="caption-with-letter-spacing light">{{ card_product.vendor }}</div>
+                <div class="caption-with-letter-spacing light card-vendor">
+                  <span class="svg-wrapper card-vendor__star" aria-hidden="true">{{- 'icon-star.svg' | inline_asset_content -}}</span>
+                  {{ card_product.vendor }}
+                </div>
               {%- endif -%}
 
               <span class="caption-large light">{{ block.settings.description | escape }}</span>
@@ -206,7 +252,9 @@
                 </p>
               {%- endif -%}
 
-              {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
+              <div id="CardPrice-{{ section_id }}-{{ card_product.id }}">
+                {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
+              </div>
               {%- if card_product.quantity_price_breaks_configured? -%}
                 {% if card_product.variants_count == 1 and quick_add == 'bulk' %}
                   {% liquid
@@ -299,7 +347,93 @@
                   assign qty_rules = true
                 endif
               -%}
-              {%- if card_product.variants_count > 1 or qty_rules -%}
+              {%- if card_product.variants_count > 1 and qty_rules == false -%}
+                <product-form data-section-id="{{ section.id }}">
+                  {%- form 'product',
+                    card_product,
+                    id: product_form_id,
+                    class: 'form',
+                    novalidate: 'novalidate',
+                    data-type: 'add-to-cart-form'
+                  -%}
+                    <input
+                      type="hidden"
+                      name="id"
+                      value="{{ card_product.selected_or_first_available_variant.id }}"
+                      class="product-variant-id"
+                    >
+                    <div class="card-variant-pills" role="list" id="CardVariantPills-{{ section_id }}-{{ card_product.id }}">
+                      {%- for variant in card_product.variants -%}
+                        {%- liquid
+                          if settings.currency_code_enabled
+                            assign variant_money_price = variant.price | money_with_currency
+                            assign variant_money_compare = variant.compare_at_price | money_with_currency
+                          else
+                            assign variant_money_price = variant.price | money
+                            assign variant_money_compare = variant.compare_at_price | money
+                          endif
+                        -%}
+                        {%- capture variant_price_html -%}
+                          <div class="price{% if variant.compare_at_price > variant.price %} price--on-sale{% endif %}">
+                            <div class="price__container">
+                              <div class="price__regular">
+                                <span class="price-item price-item--regular">{{ variant_money_price }}</span>
+                              </div>
+                              <div class="price__sale">
+                                <span><s class="price-item price-item--regular">{{ variant_money_compare }}</s></span>
+                                <span class="price-item price-item--sale price-item--last">{{ variant_money_price }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        {%- endcapture -%}
+                        <button
+                          type="button"
+                          class="card-variant-pill{% if variant == card_product.selected_or_first_available_variant %} is-selected{% endif %}"
+                          data-variant-id="{{ variant.id }}"
+                          data-price-html="{{ variant_price_html | escape }}"
+                          aria-pressed="{% if variant == card_product.selected_or_first_available_variant %}true{% else %}false{% endif %}"
+                          {% if variant.available == false %}
+                            disabled
+                          {% endif %}
+                        >
+                          {{ variant.title }}
+                        </button>
+                      {%- endfor -%}
+                    </div>
+                    <button
+                      id="{{ product_form_id }}-submit"
+                      type="submit"
+                      name="add"
+                      class="quick-add__submit button button--full-width button--secondary{% if horizontal_quick_add %} card--horizontal__quick-add{% endif %}"
+                      aria-haspopup="dialog"
+                      aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ card_product.id }}"
+                      aria-live="polite"
+                      data-sold-out-message="true"
+                      {% if card_product.selected_or_first_available_variant.available == false %}
+                        disabled
+                      {% endif %}
+                    >
+                      <span>
+                        {%- if card_product.selected_or_first_available_variant.available -%}
+                          {{ 'products.product.add_to_cart' | t }}
+                        {%- else -%}
+                          {{ 'products.product.sold_out' | t }}
+                        {%- endif -%}
+                      </span>
+                      <span class="sold-out-message hidden">
+                        {{ 'products.product.sold_out' | t }}
+                      </span>
+                      {%- if horizontal_quick_add -%}
+                        <span class="icon-wrap">
+                          {{- 'icon-plus.svg' | inline_asset_content -}}
+                        </span>
+                      {%- endif -%}
+                      {%- render 'loading-spinner' -%}
+                    </button>
+                  {%- endform -%}
+                </product-form>
+                <script src="{{ 'card-variant-pills.js' | asset_url }}" defer="defer"></script>
+              {%- elsif card_product.variants_count > 1 or qty_rules -%}
                 <modal-opener data-modal="#QuickAdd-{{ card_product.id }}">
                   <button
                     id="{{ product_form_id }}-submit"
