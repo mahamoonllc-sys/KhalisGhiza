@@ -1,0 +1,139 @@
+{%- style -%}
+  .collection-ticker-{{ section.id }} {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .collection-ticker-{{ section.id }} .marquee__track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: collection-ticker-scroll-{{ section.id }} {{ section.settings.speed }}s linear infinite;
+  }
+
+  .collection-ticker-{{ section.id }}:hover .marquee__track,
+  .collection-ticker-{{ section.id }}:focus-within .marquee__track {
+    animation-play-state: paused;
+  }
+
+  .collection-ticker-{{ section.id }} .marquee__group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .collection-ticker-{{ section.id }} .collection-ticker__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.4rem 3.5rem;
+    white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+    border-right: 1px solid rgba(var(--color-foreground), 0.1);
+  }
+
+  .collection-ticker-{{ section.id }} .collection-ticker__name {
+    font-family: var(--font-heading-family);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .collection-ticker-{{ section.id }} .collection-ticker__count {
+    font-size: 1.2rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  .collection-ticker-{{ section.id }} .collection-ticker__item .icon-arrow {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  @keyframes collection-ticker-scroll-{{ section.id }} {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .collection-ticker-{{ section.id }} .marquee__track {
+      animation: none;
+      overflow-x: auto;
+    }
+  }
+{%- endstyle -%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="collection-ticker-{{ section.id }} color-{{ section.settings.color_scheme }}">
+    <div class="marquee__track">
+      {%- for i in (1..2) -%}
+        <div class="marquee__group" {% if i == 2 %}aria-hidden="true"{% endif %}>
+          {%- for block in section.blocks -%}
+            {%- assign collection = block.settings.collection -%}
+            {%- if collection != blank -%}
+              <a href="{{ collection.url }}" class="collection-ticker__item" {{ block.shopify_attributes }}>
+                <span class="collection-ticker__name">{{ collection.title | escape }}</span>
+                <span class="collection-ticker__count">{{ collection.all_products_count }} items</span>
+                <span class="svg-wrapper">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection ticker",
+  "class": "collection-ticker-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 15,
+      "max": 80,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll duration",
+      "default": 35
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_item",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection ticker",
+      "blocks": [
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

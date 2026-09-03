@@ -1,0 +1,383 @@
+{{ 'component-rating.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .testimonials-{{ section.id }} .testimonials__layout {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .testimonials-{{ section.id }} .testimonials__layout {
+      grid-template-columns: minmax(26rem, 30%) 1fr;
+      align-items: start;
+    }
+  }
+
+  .testimonials-{{ section.id }} .testimonials__summary {
+    text-align: center;
+  }
+
+  @media screen and (min-width: 990px) {
+    .testimonials-{{ section.id }} .testimonials__summary {
+      text-align: left;
+    }
+  }
+
+  .testimonials-{{ section.id }} .testimonials__score {
+    font-family: var(--font-heading-family);
+    font-size: 4rem;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .testimonials-{{ section.id }} .testimonials__count {
+    opacity: 0.7;
+    font-size: 1.3rem;
+    margin: 0.6rem 0 1.6rem;
+  }
+
+  .testimonials-{{ section.id }} .testimonials__bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .testimonials-{{ section.id }} .testimonials__bar-track {
+    flex: 1;
+    height: 0.6rem;
+    border-radius: 1rem;
+    background: rgba(var(--color-foreground), 0.1);
+    overflow: hidden;
+  }
+
+  .testimonials-{{ section.id }} .testimonials__bar-fill {
+    height: 100%;
+    background: rgb(var(--color-foreground));
+  }
+
+  .testimonials-{{ section.id }} .testimonials__card {
+    height: 100%;
+    padding: 2.4rem;
+    border-radius: var(--text-boxes-radius);
+    background: rgba(var(--color-foreground), 0.04);
+  }
+
+  .testimonials-{{ section.id }} .testimonials__quote {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .testimonials-{{ section.id }} .testimonials__name {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .testimonials-{{ section.id }} .testimonials__verified {
+    font-size: 1.2rem;
+    opacity: 0.7;
+  }
+{%- endstyle -%}
+
+<div class="testimonials-{{ section.id }} color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width section-{{ section.id }}-padding">
+    {%- if section.settings.title != blank or section.settings.subheading != blank -%}
+      <div class="title-wrapper-with-link title-wrapper--no-top-margin">
+        {%- if section.settings.title != blank -%}
+          <h2 class="title inline-richtext {{ section.settings.heading_size }}">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <p class="rte">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="testimonials__layout">
+      {%- if section.settings.show_summary -%}
+        <div class="testimonials__summary">
+          <p class="testimonials__score">{{ section.settings.average_rating }}</p>
+          <div
+            class="rating"
+            role="img"
+            aria-label="{{ section.settings.average_rating }} out of 5 stars"
+          >
+            <span
+              aria-hidden="true"
+              class="rating-star"
+              style="--rating: {{ section.settings.average_rating | floor }}; --rating-max: 5; --rating-decimal: {{ section.settings.average_rating | modulo: 1 }};"
+            ></span>
+          </div>
+          <p class="testimonials__count">Based on {{ section.settings.review_count | escape }} reviews</p>
+
+          {%- for i in (1..5) -%}
+            {%- assign star_label = '' -%}
+            {%- assign percent = 0 -%}
+            {%- case i -%}
+              {%- when 1 -%}
+                {%- assign star_label = '5 Stars' -%}
+                {%- assign percent = section.settings.percent_5 -%}
+              {%- when 2 -%}
+                {%- assign star_label = '4 Stars' -%}
+                {%- assign percent = section.settings.percent_4 -%}
+              {%- when 3 -%}
+                {%- assign star_label = '3 Stars' -%}
+                {%- assign percent = section.settings.percent_3 -%}
+              {%- when 4 -%}
+                {%- assign star_label = '2 Stars' -%}
+                {%- assign percent = section.settings.percent_2 -%}
+              {%- when 5 -%}
+                {%- assign star_label = '1 Star' -%}
+                {%- assign percent = section.settings.percent_1 -%}
+            {%- endcase -%}
+            <div class="testimonials__bar-row">
+              <span>{{ star_label }}</span>
+              <span class="testimonials__bar-track"><span class="testimonials__bar-fill" style="width: {{ percent }}%;"></span></span>
+              <span>{{ percent }}%</span>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <slider-component class="slider-mobile-gutter">
+          <ul id="Slider-{{ section.id }}" class="testimonials__list slider slider--everywhere grid grid--1-col-tablet-down" role="list">
+            {%- for block in section.blocks -%}
+              <li id="Slide-{{ section.id }}-{{ forloop.index }}" class="testimonials__item slider__slide grid__item" {{ block.shopify_attributes }}>
+                <div class="testimonials__card">
+                  <div
+                    class="rating"
+                    role="img"
+                    aria-label="{{ block.settings.rating }} out of 5 stars"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="rating-star"
+                      style="--rating: {{ block.settings.rating }}; --rating-max: 5; --rating-decimal: 0;"
+                    ></span>
+                  </div>
+                  {%- if block.settings.quote != blank -%}
+                    <p class="testimonials__quote">"{{ block.settings.quote | escape }}"</p>
+                  {%- endif -%}
+                  <p class="testimonials__name">{{ block.settings.name | escape }}</p>
+                  {%- if block.settings.verified -%}
+                    <p class="testimonials__verified">Verified buyer</p>
+                  {%- endif -%}
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+          <div class="slider-buttons">
+            <button type="button" class="slider-button slider-button--prev" name="previous" aria-label="{{ 'general.slider.previous_slide' | t }}" aria-controls="Slider-{{ section.id }}">
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+            <div class="slider-counter caption">
+              <span class="slider-counter--current">1</span>
+              <span aria-hidden="true"> / </span>
+              <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
+              <span class="slider-counter--total">{{ section.blocks.size }}</span>
+            </div>
+            <button type="button" class="slider-button slider-button--next" name="next" aria-label="{{ 'general.slider.next_slide' | t }}" aria-controls="Slider-{{ section.id }}">
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+        </slider-component>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Testimonials carousel",
+  "class": "section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-8"
+    },
+    {
+      "type": "header",
+      "content": "Rating summary"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_summary",
+      "label": "Show rating summary",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "average_rating",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "label": "Average rating",
+      "default": 4.8
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review count text",
+      "default": "5,000+"
+    },
+    {
+      "type": "range",
+      "id": "percent_5",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "5 star %",
+      "default": 85
+    },
+    {
+      "type": "range",
+      "id": "percent_4",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "4 star %",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "percent_3",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "3 star %",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "percent_2",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "2 star %",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "percent_1",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "1 star %",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Customer name",
+          "default": "Customer name"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "Great quality and fast delivery!"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Verified buyer",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials carousel",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}

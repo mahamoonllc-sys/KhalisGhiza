@@ -11,11 +11,11 @@
   "current": {
     "logo": "shopify://shop_images/take-the-logo-in-the-first-image-as-the-base--repl.png",
     "logo_width": 260,
-    "type_header_font": "assistant_n4",
+    "type_header_font": "besley_n4",
     "heading_scale": 100,
-    "type_body_font": "assistant_n4",
+    "type_body_font": "poppins_n4",
     "body_scale": 100,
-    "page_width": 1200,
+    "page_width": 1400,
     "spacing_sections": 0,
     "spacing_grid_horizontal": 8,
     "spacing_grid_vertical": 8,
@@ -196,6 +196,50 @@
           "button": "#ffffff",
           "button_label": "#334fb4",
           "secondary_button_label": "#ffffff",
+          "shadow": "#121212"
+        }
+      },
+      "scheme-6": {
+        "settings": {
+          "background": "#faf8f5",
+          "background_gradient": "",
+          "text": "#121212",
+          "button": "#121212",
+          "button_label": "#faf8f5",
+          "secondary_button_label": "#121212",
+          "shadow": "#121212"
+        }
+      },
+      "scheme-7": {
+        "settings": {
+          "background": "#cfbca0",
+          "background_gradient": "",
+          "text": "#121212",
+          "button": "#121212",
+          "button_label": "#cfbca0",
+          "secondary_button_label": "#121212",
+          "shadow": "#121212"
+        }
+      },
+      "scheme-8": {
+        "settings": {
+          "background": "#d2f1df",
+          "background_gradient": "",
+          "text": "#121212",
+          "button": "#121212",
+          "button_label": "#d2f1df",
+          "secondary_button_label": "#121212",
+          "shadow": "#121212"
+        }
+      },
+      "scheme-9": {
+        "settings": {
+          "background": "#71d39a",
+          "background_gradient": "",
+          "text": "#121212",
+          "button": "#121212",
+          "button_label": "#71d39a",
+          "secondary_button_label": "#121212",
           "shadow": "#121212"
         }
       }

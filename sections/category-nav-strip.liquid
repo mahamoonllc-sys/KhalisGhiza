@@ -1,0 +1,129 @@
+{%- style -%}
+  .category-nav-strip-{{ section.id }} {
+    padding: 1.2rem 0;
+  }
+
+  .category-nav-strip-{{ section.id }} .category-nav-strip__list {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 3rem;
+    list-style: none;
+    margin: 0;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .category-nav-strip-{{ section.id }} .category-nav-strip__list {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  .category-nav-strip-{{ section.id }} .category-nav-strip__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-nav-strip-{{ section.id }} .category-nav-strip__item {
+    flex-shrink: 0;
+  }
+
+  .category-nav-strip-{{ section.id }} .category-nav-strip__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.3rem;
+    font-weight: 500;
+  }
+
+  .category-nav-strip-{{ section.id }} .category-nav-strip__icon {
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+{%- endstyle -%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="category-nav-strip-{{ section.id }} color-{{ section.settings.color_scheme }}">
+    <ul class="category-nav-strip__list">
+      {%- for block in section.blocks -%}
+        <li class="category-nav-strip__item" {{ block.shopify_attributes }}>
+          <a
+            class="category-nav-strip__link"
+            {% if block.settings.link != blank %}
+              href="{{ block.settings.link }}"
+            {% else %}
+              role="link" aria-disabled="true"
+            {% endif %}
+          >
+            {%- if block.settings.icon != blank -%}
+              <span class="category-nav-strip__icon" aria-hidden="true">{{ block.settings.icon }}</span>
+            {%- endif -%}
+            <span>{{ block.settings.label | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Category nav strip",
+  "class": "category-nav-strip-section",
+  "max_blocks": 16,
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-6"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_item",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Emoji/icon",
+          "default": "🌰"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Almonds"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category nav strip",
+      "blocks": [
+        { "type": "nav_item", "settings": { "icon": "🌰", "label": "Almonds" } },
+        { "type": "nav_item", "settings": { "icon": "🫘", "label": "Cashews" } },
+        { "type": "nav_item", "settings": { "icon": "🍑", "label": "Apricots" } },
+        { "type": "nav_item", "settings": { "icon": "🍒", "label": "Cherries" } },
+        { "type": "nav_item", "settings": { "icon": "🎃", "label": "Seeds" } },
+        { "type": "nav_item", "settings": { "icon": "🍯", "label": "Honey" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
