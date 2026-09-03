@@ -38,13 +38,13 @@
       "settings": {
         "image": "shopify://shop_images/Dry_fruit_website_banner_design_202609040423.jpg",
         "image_overlay_opacity": 20,
-        "image_height": "large",
+        "image_height": "adapt",
         "image_behavior": "none",
         "desktop_content_position": "middle-center",
         "desktop_content_alignment": "center",
         "show_text_box": false,
         "color_scheme": "scheme-7",
-        "stack_images_on_mobile": false,
+        "stack_images_on_mobile": true,
         "mobile_content_alignment": "center",
         "show_text_below": false
       }
