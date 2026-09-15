@@ -1,0 +1,491 @@
+{%- comment -%}
+  Note on the "one set of markup" rule (CLAUDE.md): this section deliberately
+  renders two markups from the same block loop — a real <table> for desktop and
+  a scroll-snap card carousel for mobile/tablet. A sticky-column data table and a
+  swipeable per-blend card carousel are structurally transposed (rows-of-attributes
+  vs. stacked-attributes-per-card) and need genuinely different interaction models
+  (native table semantics vs. scroll-snap + dot indicators), which CSS alone cannot
+  derive from one DOM tree without giving up one of the two explicitly requested
+  behaviors. Both renderings loop over the same section.blocks, so the content is
+  authored once; only the presentation differs per breakpoint.
+{%- endcomment -%}
+{%- style -%}
+  .kg-blend-comparison-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-blend-comparison-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .kg-blend-comparison__header {
+    max-width: 66rem;
+    margin: 0 0 2.8rem;
+  }
+
+  .kg-blend-comparison__heading {
+    margin: 0 0 0.8rem;
+  }
+
+  .kg-blend-comparison__intro {
+    margin: 0;
+    opacity: 0.75;
+  }
+
+  /* Desktop table */
+  .kg-blend-comparison__table-scroll {
+    display: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .kg-blend-comparison__table-scroll {
+      display: block;
+      overflow-x: auto;
+    }
+
+    .kg-blend-comparison__table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .kg-blend-comparison__table tr {
+      border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+    }
+
+    .kg-blend-comparison__table tr:last-child {
+      border-bottom: none;
+    }
+
+    .kg-blend-comparison__table th,
+    .kg-blend-comparison__table td {
+      padding: 1.4rem 2rem;
+      text-align: left;
+      vertical-align: top;
+      font-weight: 400;
+      min-width: 20rem;
+    }
+
+    .kg-blend-comparison__row-label {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: rgb(var(--color-background));
+      font-weight: 600;
+      min-width: 16rem;
+      white-space: nowrap;
+    }
+
+    .kg-blend-comparison__table-image {
+      width: 8rem;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: var(--buttons-radius);
+      display: block;
+    }
+
+    .kg-blend-comparison__table-name {
+      font-weight: 600;
+      font-size: 1.6rem;
+    }
+  }
+
+  /* Mobile / tablet cards */
+  .kg-blend-comparison__cards {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.6rem;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem 0.4rem;
+    -webkit-mask-image: linear-gradient(to right, black 92%, transparent);
+    mask-image: linear-gradient(to right, black 92%, transparent);
+  }
+
+  .kg-blend-comparison__card {
+    scroll-snap-align: start;
+    flex: 0 0 82%;
+    border: 1px solid rgba(var(--color-foreground), 0.08);
+    border-radius: var(--buttons-radius);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-blend-comparison__card {
+      flex-basis: 44%;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .kg-blend-comparison__cards,
+    .kg-blend-comparison__dots {
+      display: none;
+    }
+  }
+
+  .kg-blend-comparison__card-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--buttons-radius);
+    display: block;
+  }
+
+  .kg-blend-comparison__card-name {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .kg-blend-comparison__card-price {
+    margin: -0.6rem 0 0;
+  }
+
+  .kg-blend-comparison__card-list {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .kg-blend-comparison__card-list dt {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  .kg-blend-comparison__card-list dd {
+    margin: 0.2rem 0 0;
+  }
+
+  .kg-blend-comparison__dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 1.6rem;
+  }
+
+  .kg-blend-comparison__dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: rgba(var(--color-foreground), 0.2);
+  }
+
+  .kg-blend-comparison__dot.is-active {
+    background: rgb(var(--color-foreground));
+  }
+{%- endstyle -%}
+
+<div class="kg-blend-comparison-{{ section.id }} color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width">
+    {%- if section.settings.heading != blank or section.settings.intro_text != blank -%}
+      <div class="kg-blend-comparison__header">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="kg-blend-comparison__heading inline-richtext">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.intro_text != blank -%}
+          <p class="kg-blend-comparison__intro">{{ section.settings.intro_text }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- liquid
+      assign visible_count = 0
+      for block in section.blocks
+        if block.settings.product
+          assign visible_count = visible_count | plus: 1
+        endif
+      endfor
+    -%}
+
+    {%- if visible_count > 0 -%}
+      <div class="kg-blend-comparison__table-scroll">
+        <table class="kg-blend-comparison__table">
+          <tbody>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">
+                <span class="visually-hidden">Image</span>
+              </th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td {{ block.shopify_attributes }}>
+                    {%- if block.settings.product.featured_image -%}
+                      <img
+                        class="kg-blend-comparison__table-image"
+                        src="{{ block.settings.product.featured_image | image_url: width: 160 }}"
+                        alt="{{ block.settings.product.featured_image.alt | escape }}"
+                        width="160"
+                        height="160"
+                        loading="lazy"
+                        decoding="async"
+                      >
+                    {%- endif -%}
+                  </td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">Name</th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td class="kg-blend-comparison__table-name">{{ block.settings.product.title | escape }}</td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">Price</th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td>{%- render 'price', product: block.settings.product, price_class: '', show_compare_at_price: false -%}</td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">Best for</th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td>{{ block.settings.best_for | escape }}</td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">Key benefit</th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td>{{ block.settings.key_benefit | escape }}</td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">Main ingredients</th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td>{{ block.settings.main_ingredients | newline_to_br }}</td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+            <tr>
+              <th scope="row" class="kg-blend-comparison__row-label">
+                <span class="visually-hidden">View</span>
+              </th>
+              {%- for block in section.blocks -%}
+                {%- if block.settings.product -%}
+                  <td>
+                    <a href="{{ block.settings.product.url }}" class="button button--secondary">View</a>
+                  </td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <kg-blend-comparison-cards class="kg-blend-comparison__cards" role="list">
+        {%- for block in section.blocks -%}
+          {%- if block.settings.product -%}
+            <div class="kg-blend-comparison__card" data-kg-blend-card role="listitem" {{ block.shopify_attributes }}>
+              {%- if block.settings.product.featured_image -%}
+                <img
+                  class="kg-blend-comparison__card-image"
+                  src="{{ block.settings.product.featured_image | image_url: width: 400 }}"
+                  alt="{{ block.settings.product.featured_image.alt | escape }}"
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- endif -%}
+              <h3 class="kg-blend-comparison__card-name">{{ block.settings.product.title | escape }}</h3>
+              <div class="kg-blend-comparison__card-price">
+                {%- render 'price', product: block.settings.product, price_class: '', show_compare_at_price: false -%}
+              </div>
+              <dl class="kg-blend-comparison__card-list">
+                {%- if block.settings.best_for != blank -%}
+                  <div>
+                    <dt>Best for</dt>
+                    <dd>{{ block.settings.best_for | escape }}</dd>
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.key_benefit != blank -%}
+                  <div>
+                    <dt>Key benefit</dt>
+                    <dd>{{ block.settings.key_benefit | escape }}</dd>
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.main_ingredients != blank -%}
+                  <div>
+                    <dt>Main ingredients</dt>
+                    <dd>{{ block.settings.main_ingredients | newline_to_br }}</dd>
+                  </div>
+                {%- endif -%}
+              </dl>
+              <a href="{{ block.settings.product.url }}" class="button button--secondary">View</a>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </kg-blend-comparison-cards>
+
+      {%- if visible_count > 1 -%}
+        <div class="kg-blend-comparison__dots" data-kg-blend-dots>
+          {%- for i in (1..visible_count) -%}
+            <button
+              type="button"
+              class="kg-blend-comparison__dot{% if forloop.first %} is-active{% endif %}"
+              data-index="{{ forloop.index0 }}"
+              aria-label="Go to blend {{ forloop.index }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% javascript %}
+  if (!customElements.get('kg-blend-comparison-cards')) {
+    customElements.define(
+      'kg-blend-comparison-cards',
+      class KgBlendComparisonCards extends HTMLElement {
+        connectedCallback() {
+          this.cards = Array.from(this.querySelectorAll('[data-kg-blend-card]'));
+          this.dots = Array.from(
+            this.parentElement.querySelectorAll('[data-kg-blend-dots] [data-index]')
+          );
+          if (!this.cards.length || !this.dots.length) return;
+
+          this.dots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+              const card = this.cards[Number(dot.dataset.index)];
+              const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+              card?.scrollIntoView({
+                behavior: reduceMotion ? 'auto' : 'smooth',
+                inline: 'start',
+                block: 'nearest',
+              });
+            });
+          });
+
+          this.observer = new IntersectionObserver(this.onIntersect.bind(this), {
+            root: this,
+            threshold: 0.6,
+          });
+          this.cards.forEach((card) => this.observer.observe(card));
+        }
+
+        disconnectedCallback() {
+          this.observer?.disconnect();
+        }
+
+        onIntersect(entries) {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const index = this.cards.indexOf(entry.target);
+            this.dots.forEach((dot, dotIndex) => dot.classList.toggle('is-active', dotIndex === index));
+          });
+        }
+      }
+    );
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "KG Blend comparison",
+  "class": "section",
+  "tag": "section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Compare our blends"
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro text"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "blend",
+      "name": "Blend",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "best_for",
+          "label": "Best for",
+          "default": "Everyday snacking"
+        },
+        {
+          "type": "text",
+          "id": "key_benefit",
+          "label": "Key benefit",
+          "default": "High in protein"
+        },
+        {
+          "type": "textarea",
+          "id": "main_ingredients",
+          "label": "Main ingredients",
+          "default": "Almonds, Cashews, Walnuts, Raisins"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Blend comparison",
+      "blocks": [
+        { "type": "blend" },
+        { "type": "blend" },
+        { "type": "blend" }
+      ]
+    }
+  ]
+}
+{% endschema %}

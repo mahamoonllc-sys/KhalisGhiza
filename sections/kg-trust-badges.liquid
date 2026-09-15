@@ -1,0 +1,259 @@
+{%- style -%}
+  .kg-trust-badges-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-trust-badges-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .kg-trust-badges-{{ section.id }}.kg-trust-badges--divider-top {
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .kg-trust-badges-{{ section.id }}.kg-trust-badges--divider-bottom {
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .kg-trust-badges__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.4rem 1.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .kg-trust-badges__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: center;
+  }
+
+  .kg-trust-badges__item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 66%;
+  }
+
+  .kg-trust-badges__icon {
+    display: flex;
+    color: rgb(var(--color-foreground));
+    font-size: 2.6rem;
+  }
+
+  .kg-trust-badges__icon svg {
+    width: 1.6em;
+    height: 1.6em;
+  }
+
+  .kg-trust-badges__heading {
+    margin: 0;
+    font-family: var(--font-heading-family);
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .kg-trust-badges__text {
+    margin: 0;
+    font-family: var(--font-body-family);
+    font-size: 1.1rem;
+    line-height: 1.4;
+    opacity: 0.75;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-trust-badges__item:last-child:nth-child(odd) {
+      max-width: 50%;
+    }
+
+    .kg-trust-badges__icon {
+      font-size: 3rem;
+    }
+
+    .kg-trust-badges__heading {
+      font-size: 1.5rem;
+    }
+
+    .kg-trust-badges__text {
+      font-size: 1.3rem;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .kg-trust-badges__list {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1.6rem;
+    }
+
+    .kg-trust-badges__item {
+      flex: 1 1 0;
+      max-width: none;
+    }
+
+    .kg-trust-badges__item:last-child:nth-child(odd) {
+      grid-column: unset;
+      justify-self: unset;
+      max-width: none;
+    }
+  }
+{%- endstyle -%}
+
+<div class="kg-trust-badges-{{ section.id }} color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_dividers %} kg-trust-badges--divider-top kg-trust-badges--divider-bottom{% endif %}">
+  <div class="page-width">
+    {%- if section.blocks.size > 0 -%}
+      <ul class="kg-trust-badges__list" role="list">
+        {%- for block in section.blocks -%}
+          <li class="kg-trust-badges__item" {{ block.shopify_attributes }}>
+            <span class="kg-trust-badges__icon">
+              {%- render 'kg-icon', icon: block.settings.icon -%}
+            </span>
+            {%- if block.settings.heading != blank -%}
+              <p class="kg-trust-badges__heading">{{ block.settings.heading | escape }}</p>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <p class="kg-trust-badges__text">{{ block.settings.text | escape }}</p>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "KG Trust badges",
+  "class": "section",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Dividers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dividers",
+      "label": "Show thin divider lines above and below",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "box", "label": "Box" },
+            { "value": "star", "label": "Star" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "clock", "label": "Clock" },
+            { "value": "check", "label": "Check" }
+          ],
+          "default": "check"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Supporting text",
+          "default": "Supporting line"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Trust badges",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "truck",
+            "heading": "Cash on Delivery",
+            "text": "Pay when it reaches your door"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "box",
+            "heading": "Free Delivery over Rs. 3,000",
+            "text": "Nationwide"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "leaf",
+            "heading": "100% Natural",
+            "text": "No additives, no preservatives"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "clock",
+            "heading": "Freshly Packed",
+            "text": "Sealed the week you order"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
