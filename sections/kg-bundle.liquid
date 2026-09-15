@@ -1,0 +1,383 @@
+{%- comment -%}
+  DISPLAY-ONLY DISCOUNT NOTE: the "discount_note" setting below is plain text
+  chosen by the shop owner (e.g. "Save Rs. 300 on this bundle"). It does not
+  create, calculate, or apply any discount. For the price to actually drop at
+  checkout, the shop owner must create a matching automatic discount in
+  Shopify Admin (Discounts > Create discount > Automatic discount) targeting
+  this product + its companions. This section will not warn if that discount
+  is missing or out of sync with the note's text.
+
+  Cart integration reuses Dawn's own mechanism rather than reimplementing it:
+  assets/product-form.js posts to routes.cart_add_url and then calls
+  cart.getSectionsToRender() / cart.renderContents(response) on whichever of
+  <cart-notification> / <cart-drawer> is present. We do the same, just with a
+  multi-item { items: [...] } body instead of a single-item form post, which
+  is what Shopify's /cart/add.js endpoint expects for adding several variants
+  in one request.
+{%- endcomment -%}
+{%- if product -%}
+  {%- liquid
+    assign companion_blocks = section.blocks | where: 'type', 'companion'
+  -%}
+
+  {%- if companion_blocks.size > 0 -%}
+    {%- style -%}
+      .kg-bundle-{{ section.id }} {
+        padding-top: 2.8rem;
+        padding-bottom: 2.8rem;
+      }
+
+      .kg-bundle__row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.2rem;
+      }
+
+      .kg-bundle__item {
+        flex: 0 0 auto;
+      }
+
+      .kg-bundle__thumb {
+        display: block;
+        width: 6.4rem;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: var(--buttons-radius);
+        background: rgba(var(--color-foreground), 0.04);
+      }
+
+      .kg-bundle__operator {
+        flex: 0 0 auto;
+        font-size: 2rem;
+        opacity: 0.5;
+      }
+
+      .kg-bundle__checkbox-wrap {
+        position: relative;
+        display: block;
+      }
+
+      .kg-bundle__checkbox {
+        position: absolute;
+        top: -0.6rem;
+        right: -0.6rem;
+        width: 2.4rem;
+        height: 2.4rem;
+        min-width: 44px;
+        min-height: 44px;
+        margin: -10px;
+        cursor: pointer;
+      }
+
+      .kg-bundle__item--sold-out .kg-bundle__thumb {
+        opacity: 0.4;
+      }
+
+      .kg-bundle__sold-out-label {
+        display: block;
+        font-size: 1.1rem;
+        text-align: center;
+        opacity: 0.6;
+        margin-top: 0.4rem;
+      }
+
+      .kg-bundle__total-wrap {
+        flex: 1 1 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.6rem;
+        margin-top: 0.8rem;
+        padding-top: 1.6rem;
+        border-top: 1px solid rgba(var(--color-foreground), 0.08);
+      }
+
+      .kg-bundle__total-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .kg-bundle__total {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .kg-bundle__discount-note {
+        margin: 0;
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .kg-bundle__submit {
+        flex: 1 1 auto;
+        min-height: 44px;
+      }
+
+      @media screen and (min-width: 990px) {
+        .kg-bundle__total-wrap {
+          flex: 0 0 auto;
+          margin-left: auto;
+          margin-top: 0;
+          padding-top: 0;
+          border-top: none;
+        }
+
+        .kg-bundle__submit {
+          flex: 0 0 auto;
+          padding-left: 3.2rem;
+          padding-right: 3.2rem;
+        }
+      }
+    {%- endstyle -%}
+
+    {%- liquid
+      assign main_variant = product.selected_or_first_available_variant
+      assign combo_total = 1
+      for block in companion_blocks
+        assign combo_total = combo_total | times: 2
+      endfor
+      assign combo_max = combo_total | minus: 1
+    -%}
+
+    <kg-bundle
+      class="kg-bundle-{{ section.id }}"
+      data-main-variant-id="{{ main_variant.id }}"
+    >
+      <div class="page-width">
+        <div class="kg-bundle__row">
+          <div class="kg-bundle__item">
+            {%- if product.featured_image -%}
+              <img
+                class="kg-bundle__thumb"
+                src="{{ product.featured_image | image_url: width: 128 }}"
+                alt="{{ product.featured_image.alt | escape }}"
+                width="128"
+                height="128"
+                loading="lazy"
+                decoding="async"
+              >
+            {%- endif -%}
+          </div>
+
+          {%- for block in companion_blocks -%}
+            {%- assign companion = block.settings.product -%}
+            {%- if companion -%}
+              {%- assign companion_variant = companion.selected_or_first_available_variant -%}
+              <span class="kg-bundle__operator" aria-hidden="true">+</span>
+              <div
+                class="kg-bundle__item{% unless companion_variant.available %} kg-bundle__item--sold-out{% endunless %}"
+                {{ block.shopify_attributes }}
+              >
+                <label class="kg-bundle__checkbox-wrap">
+                  <span class="visually-hidden">{{ companion.title | escape }}</span>
+                  {%- if companion.featured_image -%}
+                    <img
+                      class="kg-bundle__thumb"
+                      src="{{ companion.featured_image | image_url: width: 128 }}"
+                      alt=""
+                      width="128"
+                      height="128"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  {%- endif -%}
+                  <input
+                    type="checkbox"
+                    class="kg-bundle__checkbox"
+                    data-kg-bundle-checkbox
+                    value="{{ companion_variant.id }}"
+                    {% if companion_variant.available %}
+                      checked
+                    {% else %}
+                      disabled
+                    {% endif %}
+                  >
+                </label>
+                {%- unless companion_variant.available -%}
+                  <span class="kg-bundle__sold-out-label">{{ 'products.product.sold_out' | t }}</span>
+                {%- endunless -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+
+          <span class="kg-bundle__operator" aria-hidden="true">=</span>
+
+          <div class="kg-bundle__total-wrap">
+            <div class="kg-bundle__total-info">
+              <p class="kg-bundle__total" data-kg-bundle-total>
+                {{- main_variant.price | money -}}
+              </p>
+              {%- if section.settings.discount_note != blank -%}
+                <p class="kg-bundle__discount-note">{{ section.settings.discount_note | escape }}</p>
+              {%- endif -%}
+            </div>
+            <button type="button" class="kg-bundle__submit button button--primary" data-kg-bundle-submit>
+              Add selected to cart
+            </button>
+          </div>
+        </div>
+
+        <script type="application/json" data-kg-bundle-totals>
+          {
+            {%- for mask in (0..combo_max) -%}
+              {%- liquid
+                assign cents = main_variant.price
+                for block in companion_blocks
+                  assign companion_variant = block.settings.product.selected_or_first_available_variant
+                  case forloop.index0
+                    when 0
+                      assign bit_value = 1
+                    when 1
+                      assign bit_value = 2
+                    when 2
+                      assign bit_value = 4
+                  endcase
+                  assign double_bit = bit_value | times: 2
+                  assign bit_check = mask | modulo: double_bit
+                  if bit_check >= bit_value and companion_variant.available
+                    assign cents = cents | plus: companion_variant.price
+                  endif
+                endfor
+              -%}
+              "{{ mask }}": {{ cents | money | json }}{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          }
+        </script>
+      </div>
+    </kg-bundle>
+
+    {% javascript %}
+      if (!customElements.get('kg-bundle')) {
+        customElements.define(
+          'kg-bundle',
+          class KgBundle extends HTMLElement {
+            connectedCallback() {
+              this.checkboxes = Array.from(this.querySelectorAll('[data-kg-bundle-checkbox]'));
+              this.totalEl = this.querySelector('[data-kg-bundle-total]');
+              this.submitButton = this.querySelector('[data-kg-bundle-submit]');
+              this.priceMap = JSON.parse(this.querySelector('[data-kg-bundle-totals]').textContent);
+              this.mainVariantId = this.dataset.mainVariantId;
+
+              this.checkboxes.forEach((checkbox) => checkbox.addEventListener('change', this.update.bind(this)));
+              this.submitButton.addEventListener('click', this.onSubmit.bind(this));
+
+              this.update();
+            }
+
+            getMask() {
+              return this.checkboxes.reduce(
+                (mask, checkbox, index) => (checkbox.checked ? mask | (1 << index) : mask),
+                0
+              );
+            }
+
+            update() {
+              const mask = this.getMask();
+              if (this.priceMap[mask] !== undefined) this.totalEl.textContent = this.priceMap[mask];
+              this.submitButton.toggleAttribute('disabled', mask === 0);
+            }
+
+            onSubmit() {
+              if (this.submitButton.hasAttribute('disabled')) return;
+
+              const items = [{ id: this.mainVariantId, quantity: 1 }];
+              this.checkboxes.forEach((checkbox) => {
+                if (checkbox.checked) items.push({ id: checkbox.value, quantity: 1 });
+              });
+
+              const cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+              const config = fetchConfig('javascript');
+              const body = { items };
+
+              if (cart) {
+                body.sections = cart.getSectionsToRender().map((section) => section.id);
+                body.sections_url = window.location.pathname;
+              }
+              config.body = JSON.stringify(body);
+
+              this.submitButton.setAttribute('aria-disabled', 'true');
+              this.submitButton.classList.add('loading');
+
+              fetch(`${routes.cart_add_url}`, config)
+                .then((response) => response.json())
+                .then((response) => {
+                  if (response.status) {
+                    publish(PUB_SUB_EVENTS.cartError, {
+                      source: 'kg-bundle',
+                      errors: response.errors || response.description,
+                      message: response.message,
+                    });
+                    return;
+                  }
+
+                  if (cart) {
+                    cart.renderContents(response);
+                  } else {
+                    window.location = window.routes.cart_url;
+                    return;
+                  }
+
+                  publish(PUB_SUB_EVENTS.cartUpdate, {
+                    source: 'kg-bundle',
+                    cartData: response,
+                  });
+                })
+                .catch((error) => console.error(error))
+                .finally(() => {
+                  this.submitButton.classList.remove('loading');
+                  this.submitButton.removeAttribute('aria-disabled');
+                });
+            }
+          }
+        );
+      }
+    {% endjavascript %}
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "KG Bundle",
+  "class": "section",
+  "tag": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "text",
+      "id": "discount_note",
+      "label": "Discount note (display only)",
+      "info": "Plain text shown next to the total, e.g. \"Save Rs. 300 on this bundle\". Create a matching automatic discount in Shopify Admin — this text does not apply one.",
+      "default": ""
+    }
+  ],
+  "blocks": [
+    {
+      "type": "companion",
+      "name": "Companion product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Bundle",
+      "blocks": [
+        { "type": "companion" },
+        { "type": "companion" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,333 @@
+{%- comment -%}
+  Reads and reuses Dawn's own product-page hooks rather than reimplementing them:
+  - Variant state: assets/product-info.js publishes PUB_SUB_EVENTS.variantChange
+    ({ sectionId, html, variant }) via assets/pubsub.js after it swaps in the new
+    variant's price/availability markup.
+  - Price markup: snippets/price.liquid renders into #price-{{ section.id }} on the
+    main product section; we copy its innerHTML instead of reformatting money in JS.
+  - Add to cart: snippets/buy-buttons.liquid wraps the real <form> in a <product-form>
+    custom element (assets/product-form.js) with data-section-id. We call
+    realForm.requestSubmit() on that exact form so Dawn's own submit handler runs
+    (POST to routes.cart_add_url, cart drawer / cart count refresh, PUB_SUB_EVENTS.cartUpdate).
+  - Header offset: sections/header.liquid's sticky-header component sets
+    --header-height on <html>; we sit below it instead of guessing a header height.
+{%- endcomment -%}
+{%- if product -%}
+  {%- style -%}
+    kg-sticky-atc {
+      display: block;
+    }
+
+    .kg-sticky-atc__bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 400;
+      background: rgb(var(--color-background));
+      border-top: 1px solid rgba(var(--color-foreground), 0.08);
+      box-shadow: 0 -2px 8px rgba(var(--color-shadow), 0.08);
+      transform: translateY(100%);
+      transition: transform 0.25s ease;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    kg-sticky-atc[data-visible='true'] .kg-sticky-atc__bar {
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .kg-sticky-atc__bar {
+        transition: none;
+      }
+    }
+
+    .kg-sticky-atc__inner {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 0.8rem;
+      padding-bottom: 0.8rem;
+    }
+
+    .kg-sticky-atc__media {
+      flex: 0 0 auto;
+      width: 4.4rem;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--buttons-radius);
+      overflow: hidden;
+      background: rgba(var(--color-foreground), 0.04);
+    }
+
+    .kg-sticky-atc__image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .kg-sticky-atc__title {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+      font-size: 1.3rem;
+      font-family: var(--font-body-family);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kg-sticky-atc__end {
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+      min-width: 0;
+      gap: 0.8rem;
+    }
+
+    .kg-sticky-atc__price {
+      flex: 0 0 auto;
+      font-size: 1.3rem;
+      white-space: nowrap;
+    }
+
+    .kg-sticky-atc__price .unit-price,
+    .kg-sticky-atc__price .price__sale .price-item--regular {
+      display: none;
+    }
+
+    .kg-sticky-atc__submit {
+      flex: 1 1 auto;
+      min-height: 44px;
+    }
+
+    @media screen and (min-width: 750px) and (max-width: 989px) {
+      .kg-sticky-atc__submit {
+        flex: 0 1 auto;
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+
+    @media screen and (min-width: 990px) {
+      .kg-sticky-atc__bar {
+        top: var(--header-height, 0px);
+        bottom: auto;
+        border-top: none;
+        border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+        box-shadow: 0 2px 8px rgba(var(--color-shadow), 0.08);
+        transform: translateY(-100%);
+      }
+
+      .kg-sticky-atc__inner {
+        padding-top: 1.2rem;
+        padding-bottom: 1.2rem;
+      }
+
+      .kg-sticky-atc__end {
+        flex: 0 0 auto;
+        margin-left: auto;
+      }
+
+      .kg-sticky-atc__submit {
+        flex: 0 0 auto;
+        padding-left: 3.2rem;
+        padding-right: 3.2rem;
+        min-width: auto;
+      }
+    }
+
+    @media screen and (max-width: 989px) {
+      kg-sticky-atc[data-enable-mobile='false'] .kg-sticky-atc__bar {
+        display: none;
+      }
+    }
+
+    @media screen and (min-width: 990px) {
+      kg-sticky-atc[data-enable-desktop='false'] .kg-sticky-atc__bar {
+        display: none;
+      }
+    }
+
+    body.kg-sticky-atc-padding {
+      padding-bottom: var(--kg-sticky-atc-height, 7.2rem);
+    }
+
+    @media screen and (min-width: 990px) {
+      body.kg-sticky-atc-padding {
+        padding-bottom: 0;
+      }
+    }
+  {%- endstyle -%}
+
+  <kg-sticky-atc
+    class="kg-sticky-atc"
+    data-enable-desktop="{{ section.settings.enable_desktop }}"
+    data-enable-mobile="{{ section.settings.enable_mobile }}"
+    data-sold-out-text="{{ 'products.product.sold_out' | t | escape }}"
+    data-button-label="{{ section.settings.button_label | escape }}"
+  >
+    <div class="kg-sticky-atc__bar">
+      <div class="page-width kg-sticky-atc__inner">
+        {%- if section.settings.show_thumbnail and product.featured_image -%}
+          <div class="kg-sticky-atc__media">
+            <img
+              class="kg-sticky-atc__image"
+              src="{{ product.featured_image | image_url: width: 160 }}"
+              alt="{{ product.featured_image.alt | escape }}"
+              width="{{ product.featured_image.width }}"
+              height="{{ product.featured_image.height }}"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+        {%- endif -%}
+
+        <p class="kg-sticky-atc__title">{{ product.title | escape }}</p>
+
+        <div class="kg-sticky-atc__end">
+          <div class="kg-sticky-atc__price" data-kg-sticky-atc-price>
+            {%- render 'price', product: product, price_class: '', show_compare_at_price: false -%}
+          </div>
+
+          <button
+            type="button"
+            class="kg-sticky-atc__submit button button--primary"
+            data-kg-sticky-atc-submit
+            {% unless product.selected_or_first_available_variant.available %}
+              disabled
+            {% endunless %}
+          >
+            <span data-kg-sticky-atc-submit-text>
+              {%- if product.selected_or_first_available_variant.available -%}
+                {{ section.settings.button_label | escape }}
+              {%- else -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- endif -%}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </kg-sticky-atc>
+
+  {% javascript %}
+    if (!customElements.get('kg-sticky-atc')) {
+      customElements.define(
+        'kg-sticky-atc',
+        class KgStickyAtc extends HTMLElement {
+          connectedCallback() {
+            this.productForm = document.querySelector('product-form');
+            if (!this.productForm) return;
+
+            this.mainSectionId = this.productForm.dataset.sectionId;
+            this.bar = this.querySelector('.kg-sticky-atc__bar');
+            this.priceSlot = this.querySelector('[data-kg-sticky-atc-price]');
+            this.submitButton = this.querySelector('[data-kg-sticky-atc-submit]');
+            this.submitButtonText = this.querySelector('[data-kg-sticky-atc-submit-text]');
+            this.mobileQuery = window.matchMedia('(max-width: 989px)');
+
+            this.submitButton.addEventListener('click', this.onSubmitClick.bind(this));
+
+            this.intersectionObserver = new IntersectionObserver(this.onIntersect.bind(this), { threshold: 0 });
+            this.intersectionObserver.observe(this.productForm);
+
+            this.resizeObserver = new ResizeObserver(this.onResize.bind(this));
+            this.resizeObserver.observe(this.bar);
+
+            this.variantChangeUnsubscriber = subscribe(PUB_SUB_EVENTS.variantChange, this.onVariantChange.bind(this));
+          }
+
+          disconnectedCallback() {
+            this.intersectionObserver?.disconnect();
+            this.resizeObserver?.disconnect();
+            this.variantChangeUnsubscriber?.();
+          }
+
+          onIntersect(entries) {
+            const entry = entries[0];
+            const scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+            this.setAttribute('data-visible', scrolledPast ? 'true' : 'false');
+            this.updateBodyPadding(scrolledPast);
+          }
+
+          onResize(entries) {
+            const height = entries[0]?.contentRect?.height;
+            if (height) {
+              document.body.style.setProperty('--kg-sticky-atc-height', `${height}px`);
+            }
+          }
+
+          updateBodyPadding(visible) {
+            const isMobile = this.mobileQuery.matches;
+            const enableMobile = this.dataset.enableMobile !== 'false';
+            document.body.classList.toggle('kg-sticky-atc-padding', visible && isMobile && enableMobile);
+          }
+
+          onSubmitClick() {
+            if (this.submitButton.hasAttribute('disabled')) return;
+            const realForm = this.productForm.querySelector('form');
+            realForm?.requestSubmit();
+          }
+
+          onVariantChange({ data }) {
+            if (!data || data.sectionId !== this.mainSectionId) return;
+
+            const sourcePrice = document.getElementById(`price-${this.mainSectionId}`);
+            if (sourcePrice && this.priceSlot) {
+              this.priceSlot.innerHTML = sourcePrice.innerHTML;
+            }
+
+            const available = Boolean(data.variant && data.variant.available);
+            this.submitButton.toggleAttribute('disabled', !available);
+            this.submitButtonText.textContent = available
+              ? this.dataset.buttonLabel
+              : this.dataset.soldOutText;
+          }
+        }
+      );
+    }
+  {% endjavascript %}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "KG Sticky add to cart",
+  "class": "section",
+  "tag": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_desktop",
+      "label": "Enable on desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile",
+      "label": "Enable on mobile",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Add to cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnail",
+      "label": "Show product thumbnail",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Sticky add to cart"
+    }
+  ]
+}
+{% endschema %}

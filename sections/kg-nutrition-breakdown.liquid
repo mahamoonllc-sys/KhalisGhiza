@@ -1,0 +1,294 @@
+{%- style -%}
+  .kg-nutrition-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-nutrition-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .kg-nutrition__heading {
+    margin: 0 0 2.4rem;
+  }
+
+  .kg-nutrition__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.2rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .kg-nutrition__grid {
+      grid-template-columns: 3fr 2fr;
+      align-items: start;
+      gap: 4.8rem;
+    }
+  }
+
+  .kg-nutrition__bars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+
+  .kg-nutrition__bar-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+  }
+
+  .kg-nutrition__bar-name {
+    font-weight: 600;
+  }
+
+  .kg-nutrition__bar-track {
+    width: 100%;
+    height: 1rem;
+    border-radius: 999px;
+    background: rgba(var(--color-foreground), 0.08);
+    overflow: hidden;
+  }
+
+  .kg-nutrition__bar-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .kg-nutrition__total {
+    margin: 2rem 0 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    opacity: 0.75;
+  }
+
+  .kg-nutrition__serving {
+    margin: 0 0 1.2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .kg-nutrition__table-scroll {
+    overflow-x: auto;
+  }
+
+  .kg-nutrition__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .kg-nutrition__table tr {
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .kg-nutrition__table tr:last-child {
+    border-bottom: none;
+  }
+
+  .kg-nutrition__table th,
+  .kg-nutrition__table td {
+    padding: 1rem 0;
+    text-align: left;
+    font-size: 1.4rem;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .kg-nutrition__table td {
+    text-align: right;
+  }
+{%- endstyle -%}
+
+<div class="kg-nutrition-{{ section.id }} color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="kg-nutrition__heading inline-richtext">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- liquid
+      assign total_weight = 0
+      for block in section.blocks
+        if block.type == 'ingredient'
+          assign total_weight = total_weight | plus: block.settings.weight
+        endif
+      endfor
+    -%}
+
+    <div class="kg-nutrition__grid">
+      <div class="kg-nutrition__ingredients">
+        {%- if section.blocks.size > 0 -%}
+          <ul class="kg-nutrition__bars">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'ingredient' -%}
+                {%- liquid
+                  assign share = 0
+                  if total_weight > 0
+                    assign share = block.settings.weight | times: 1.0 | divided_by: total_weight | times: 100
+                  endif
+                -%}
+                <li class="kg-nutrition__bar-row" {{ block.shopify_attributes }}>
+                  <div class="kg-nutrition__bar-label">
+                    <span class="kg-nutrition__bar-name">{{ block.settings.name | escape }}</span>
+                    <span class="kg-nutrition__bar-weight">{{ block.settings.weight }}g</span>
+                  </div>
+                  <div class="kg-nutrition__bar-track">
+                    <div
+                      class="kg-nutrition__bar-fill"
+                      style="width: {{ share }}%; background-color: {{ block.settings.color }};"
+                    ></div>
+                  </div>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+          {%- if total_weight > 0 -%}
+            <p class="kg-nutrition__total">Total weight: {{ total_weight }}g</p>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+
+      <div class="kg-nutrition__table-wrap">
+        {%- if section.settings.serving_size_label != blank -%}
+          <p class="kg-nutrition__serving">{{ section.settings.serving_size_label | escape }}</p>
+        {%- endif -%}
+        <div class="kg-nutrition__table-scroll">
+          <table class="kg-nutrition__table">
+            <tbody>
+              {%- for block in section.blocks -%}
+                {%- if block.type == 'nutrient' -%}
+                  <tr {{ block.shopify_attributes }}>
+                    <th scope="row">{{ block.settings.name | escape }}</th>
+                    <td>{{ block.settings.amount | escape }}</td>
+                  </tr>
+                {%- endif -%}
+              {%- endfor -%}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "KG Nutrition breakdown",
+  "class": "section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What's inside"
+    },
+    {
+      "type": "text",
+      "id": "serving_size_label",
+      "label": "Serving size label",
+      "default": "Per 30g handful"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ingredient",
+      "name": "Ingredient",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Almonds"
+        },
+        {
+          "type": "number",
+          "id": "weight",
+          "label": "Weight (grams)",
+          "default": 50
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Bar color",
+          "default": "#B08D57"
+        }
+      ]
+    },
+    {
+      "type": "nutrient",
+      "name": "Nutrient",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nutrient name",
+          "default": "Energy"
+        },
+        {
+          "type": "text",
+          "id": "amount",
+          "label": "Amount",
+          "default": "160 kcal"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Nutrition breakdown",
+      "blocks": [
+        { "type": "ingredient", "settings": { "name": "Almonds", "weight": 50, "color": "#C9A66B" } },
+        { "type": "ingredient", "settings": { "name": "Walnuts", "weight": 50, "color": "#8C6D46" } },
+        { "type": "ingredient", "settings": { "name": "Cashews", "weight": 50, "color": "#E4CFA0" } },
+        { "type": "ingredient", "settings": { "name": "Pumpkin Seeds", "weight": 50, "color": "#5F7A4B" } },
+        { "type": "ingredient", "settings": { "name": "Raisins", "weight": 50, "color": "#5A3A3A" } },
+        { "type": "nutrient", "settings": { "name": "Energy", "amount": "160 kcal" } },
+        { "type": "nutrient", "settings": { "name": "Protein", "amount": "5.2 g" } },
+        { "type": "nutrient", "settings": { "name": "Fibre", "amount": "2.0 g" } },
+        { "type": "nutrient", "settings": { "name": "Healthy fats", "amount": "12 g" } },
+        { "type": "nutrient", "settings": { "name": "Magnesium", "amount": "50 mg" } },
+        { "type": "nutrient", "settings": { "name": "Potassium", "amount": "90 mg" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

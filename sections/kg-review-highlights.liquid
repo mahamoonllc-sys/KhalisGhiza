@@ -1,0 +1,191 @@
+{%- comment -%}
+  Curated homepage social proof — entirely separate from the review app's own
+  feed and widgets. Deliberately does NOT emit Review/AggregateRating structured
+  data: these are hand-picked, unverified-by-the-app quotes, and duplicate or
+  unverifiable review schema can get a site flagged by Google. The installed
+  review app owns all structured data for real, verified reviews.
+{%- endcomment -%}
+{%- style -%}
+  .kg-review-highlights__list {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.6rem;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem 0.4rem;
+    list-style: none;
+  }
+
+  .kg-review-highlights__item {
+    scroll-snap-align: start;
+    flex: 0 0 85%;
+    border: 1px solid rgba(var(--color-foreground), 0.08);
+    border-radius: var(--buttons-radius);
+    padding: 2.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-review-highlights__list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      overflow-x: visible;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .kg-review-highlights__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.4rem;
+    }
+  }
+
+  .kg-review-highlights__stars {
+    display: flex;
+    gap: 0.2rem;
+    color: rgb(var(--color-foreground));
+  }
+
+  .kg-review-highlights__stars svg {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .kg-review-highlights__quote {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .kg-review-highlights__photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: var(--buttons-radius);
+  }
+
+  .kg-review-highlights__author {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .kg-review-highlights__city {
+    font-weight: 400;
+    opacity: 0.6;
+  }
+{%- endstyle -%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="kg-review-highlights-{{ section.id }}">
+    <div class="page-width">
+      <ul class="kg-review-highlights__list" role="list">
+        {%- for block in section.blocks -%}
+          <li class="kg-review-highlights__item" {{ block.shopify_attributes }}>
+            <div class="kg-review-highlights__stars" role="img" aria-label="{{ block.settings.rating }} out of 5 stars">
+              {%- for i in (1..5) -%}
+                {%- if i <= block.settings.rating -%}
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                    <path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.2-5.4 3.2 1.3-6-4.6-4.1 6.1-.6z"></path>
+                  </svg>
+                {%- else -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.2-5.4 3.2 1.3-6-4.6-4.1 6.1-.6z"></path>
+                  </svg>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+
+            {%- if block.settings.photo -%}
+              <img
+                class="kg-review-highlights__photo"
+                src="{{ block.settings.photo | image_url: width: 480 }}"
+                alt=""
+                width="{{ block.settings.photo.width }}"
+                height="{{ block.settings.photo.height }}"
+                loading="lazy"
+                decoding="async"
+              >
+            {%- endif -%}
+
+            {%- if block.settings.quote != blank -%}
+              <p class="kg-review-highlights__quote">&ldquo;{{ block.settings.quote }}&rdquo;</p>
+            {%- endif -%}
+
+            <p class="kg-review-highlights__author">
+              {{ block.settings.customer_name | escape }}
+              {%- if block.settings.city != blank -%}
+                <span class="kg-review-highlights__city">, {{ block.settings.city | escape }}</span>
+              {%- endif -%}
+            </p>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "KG Review highlights",
+  "class": "section",
+  "tag": "section",
+  "max_blocks": 4,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "This is exactly the quality I expected — fresh, generous portions, and it arrived quickly."
+        },
+        {
+          "type": "text",
+          "id": "customer_name",
+          "label": "Customer name",
+          "default": "Ayesha K."
+        },
+        {
+          "type": "text",
+          "id": "city",
+          "label": "City",
+          "default": "Lahore"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Star rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "image_picker",
+          "id": "photo",
+          "label": "Photo (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Review highlights",
+      "blocks": [
+        { "type": "quote" },
+        { "type": "quote", "settings": { "customer_name": "Bilal R.", "city": "Karachi" } },
+        { "type": "quote", "settings": { "customer_name": "Sana M.", "city": "Islamabad" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
