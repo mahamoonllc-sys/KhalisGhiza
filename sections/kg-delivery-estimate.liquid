@@ -1,0 +1,191 @@
+{%- comment -%}
+  Business-day delivery window is computed entirely in Liquid from today's real
+  date — no JS, no client/server mismatch, works with JS disabled. Loop caps at
+  30 calendar days as a safety bound; with sane min/max settings (a handful of
+  business days) it always resolves long before that.
+{%- endcomment -%}
+{%- style -%}
+  .kg-delivery-estimate-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .kg-delivery-estimate-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .kg-delivery-estimate-{{ section.id }} .kg-delivery-estimate__box {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.6rem 2rem;
+    border: 1px solid rgba(var(--color-foreground), 0.12);
+    border-radius: var(--buttons-radius);
+  }
+
+  .kg-delivery-estimate-{{ section.id }} .kg-delivery-estimate__icon {
+    flex: 0 0 auto;
+    display: flex;
+    color: rgb(var(--color-foreground));
+  }
+
+  .kg-delivery-estimate-{{ section.id }} .kg-delivery-estimate__icon svg {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .kg-delivery-estimate-{{ section.id }} .kg-delivery-estimate__text {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .kg-delivery-estimate-{{ section.id }} .kg-delivery-estimate__label {
+    display: block;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    margin-bottom: 0.2rem;
+  }
+
+  .kg-delivery-estimate-{{ section.id }} .kg-delivery-estimate__range {
+    font-weight: 600;
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign business_days_found = 0
+  assign start_ts = 0
+  assign end_ts = 0
+
+  for i in (1..30)
+    assign seconds_offset = i | times: 86400
+    assign candidate_ts = now_ts | plus: seconds_offset
+    assign weekday = candidate_ts | date: '%w'
+
+    assign is_weekend = false
+    if section.settings.exclude_weekends and weekday == '0'
+      assign is_weekend = true
+    endif
+    if section.settings.exclude_weekends and weekday == '6'
+      assign is_weekend = true
+    endif
+
+    unless is_weekend
+      assign business_days_found = business_days_found | plus: 1
+      if business_days_found == section.settings.min_days and start_ts == 0
+        assign start_ts = candidate_ts
+      endif
+      if business_days_found == section.settings.max_days
+        assign end_ts = candidate_ts
+        break
+      endif
+    endunless
+  endfor
+-%}
+
+{%- if start_ts > 0 and end_ts > 0 -%}
+  <div class="kg-delivery-estimate-{{ section.id }} color-{{ section.settings.color_scheme }} gradient">
+    <div class="page-width">
+      <div class="kg-delivery-estimate__box">
+        <span class="kg-delivery-estimate__icon">
+          {%- render 'kg-icon', icon: 'truck' -%}
+        </span>
+        <p class="kg-delivery-estimate__text">
+          {%- if section.settings.heading != blank -%}
+            <span class="kg-delivery-estimate__label">{{ section.settings.heading | escape }}</span>
+          {%- endif -%}
+          <span class="kg-delivery-estimate__range">
+            {{- start_ts | date: '%a, %b %-d' }} &ndash; {{ end_ts | date: '%a, %b %-d' -}}
+          </span>
+          {%- if section.settings.exclude_weekends -%}
+            (excl. weekends)
+          {%- endif -%}
+        </p>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "KG Delivery estimate",
+  "class": "section",
+  "tag": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Label text",
+      "default": "Estimated delivery"
+    },
+    {
+      "type": "range",
+      "id": "min_days",
+      "min": 1,
+      "max": 14,
+      "step": 1,
+      "label": "Fastest delivery (business days from today)",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "max_days",
+      "min": 1,
+      "max": 21,
+      "step": 1,
+      "label": "Slowest delivery (business days from today)",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "exclude_weekends",
+      "label": "Skip Saturday and Sunday when counting days",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "KG Delivery estimate"
+    }
+  ]
+}
+{% endschema %}
