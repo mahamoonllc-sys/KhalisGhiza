@@ -11,6 +11,7 @@
   "current": {
     "logo": "shopify://shop_images/take-the-logo-in-the-first-image-as-the-base--repl.png",
     "logo_width": 260,
+    "favicon": "shopify://shop_images/KhalisGhiza.png",
     "type_header_font": "besley_n4",
     "heading_scale": 100,
     "type_body_font": "poppins_n4",
